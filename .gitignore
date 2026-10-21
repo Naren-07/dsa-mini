@@ -1,0 +1,21 @@
+# Build artifacts
+build/
+bin/
+*.exe
+*.o
+*.obj
+*.pdb
+*.ilk
+
+# VS Code / IDE
+.vscode/
+.idea/
+
+# OS artifacts
+Thumbs.db
+[Dd]esktop.ini
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
