@@ -1,33 +1,41 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rover PathLab | Autonomous Planetary Navigation Studio</title>
+  <title>Rover PathLab | Mars Planetary Navigation & Replanning Studio</title>
+  <meta name="description" content="Autonomous Martian Rover Navigation Studio powered by C++17 A*, Dijkstra, BFS, and Greedy Search with real-time dynamic obstacle replanning.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800;900&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="app-shell">
-    <!-- Top Navigation Header -->
+    <!-- Top Mission Control Navigation Header -->
     <header class="app-header">
       <div class="brand">
-        <div class="logo-mark">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="3"/>
-            <path d="M12 2v3m0 14v3M2 12h3m14 0h3"/>
-            <path d="M4.93 4.93l2.12 2.12m9.9 9.9l2.12 2.12M4.93 19.07l2.12-2.12m9.9-9.9l2.12-2.12"/>
+        <div class="logo-mark" aria-hidden="true">
+          <!-- Stylized Mars Rover & Radar SVG Icon -->
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3" />
+            <path d="M12 2v3m0 14v3M2 12h3m14 0h3" />
+            <path d="M4.93 4.93l2.12 2.12m9.9 9.9l2.12 2.12M4.93 19.07l2.12-2.12m9.9-9.9l2.12-2.12" />
           </svg>
         </div>
         <div class="brand-text">
           <h1>ROVER PATHLAB</h1>
-          <span class="sub-brand">Planetary Navigation & Replanning Engine</span>
+          <span class="sub-brand">Autonomous Planetary Navigation & Dynamic Replanning Studio</span>
         </div>
       </div>
 
       <div class="header-status">
+        <button class="header-action-btn" id="btnSoundToggle" title="Toggle Sound FX (Shortcut: M)">
+          🔇 Audio Off
+        </button>
+        <button class="header-action-btn" id="btnThemeToggle" title="Toggle Night-Side / Daylight Theme">
+          🌙 Night-Side
+        </button>
         <div class="status-badge" id="backendStatusBadge">
           <span class="status-dot pulsing" id="statusDot"></span>
           <span class="status-label" id="statusText">Connecting to C++ Engine...</span>
@@ -38,143 +46,164 @@
 
     <!-- Main Workspace Grid -->
     <main class="app-main">
-      <!-- Left Control Sidebar -->
+      <!-- Left Mission Control Sidebar -->
       <aside class="control-sidebar">
         <!-- Terrain Palette -->
         <section class="panel-section">
-          <h2 class="section-title">Terrain Palette</h2>
+          <h2 class="section-title">Surface Terrain Palette</h2>
           <div class="palette-grid" id="paletteGrid">
-            <button class="palette-btn active" data-terrain="0" id="toolPlain">
+            <button class="palette-btn active" data-terrain="0" id="toolPlain" title="Plain Regolith (Cost 1)">
               <span class="terrain-swatch plain"></span>
               <div class="terrain-meta">
-                <span class="name">Plain</span>
+                <span class="name">Plain Soil</span>
                 <span class="cost">Cost: 1</span>
               </div>
             </button>
-            <button class="palette-btn" data-terrain="1" id="toolRough">
+            <button class="palette-btn" data-terrain="1" id="toolRough" title="Rough Basalt (Cost 2)">
               <span class="terrain-swatch rough"></span>
               <div class="terrain-meta">
-                <span class="name">Rough</span>
+                <span class="name">Rough Basalt</span>
                 <span class="cost">Cost: 2</span>
               </div>
             </button>
-            <button class="palette-btn" data-terrain="2" id="toolMud">
+            <button class="palette-btn" data-terrain="2" id="toolMud" title="Clay Mire (Cost 3)">
               <span class="terrain-swatch mud"></span>
               <div class="terrain-meta">
-                <span class="name">Mud</span>
+                <span class="name">Clay Sludge</span>
                 <span class="cost">Cost: 3</span>
               </div>
             </button>
-            <button class="palette-btn" data-terrain="3" id="toolSand">
+            <button class="palette-btn" data-terrain="3" id="toolSand" title="Dune Sand (Cost 5)">
               <span class="terrain-swatch sand"></span>
               <div class="terrain-meta">
-                <span class="name">Sand</span>
+                <span class="name">Dune Sand</span>
                 <span class="cost">Cost: 5</span>
               </div>
             </button>
-            <button class="palette-btn" data-terrain="4" id="toolRock">
+            <button class="palette-btn" data-terrain="4" id="toolRock" title="Rock Outcrop (Impassable)">
               <span class="terrain-swatch rock"></span>
               <div class="terrain-meta">
                 <span class="name">Rock Wall</span>
                 <span class="cost">Impassable</span>
               </div>
             </button>
-            <button class="palette-btn" data-mode="start" id="toolStart">
-              <span class="terrain-swatch start">📍</span>
+            <button class="palette-btn" data-mode="start" id="toolStart" title="Place Rover Starting Position">
+              <span class="terrain-swatch start"></span>
               <div class="terrain-meta">
-                <span class="name">Set Start</span>
-                <span class="cost">Rover Origin</span>
+                <span class="name">Set Rover</span>
+                <span class="cost">Start Origin</span>
               </div>
             </button>
-            <button class="palette-btn" data-mode="goal" id="toolGoal">
-              <span class="terrain-swatch goal">🎯</span>
+            <button class="palette-btn" data-mode="goal" id="toolGoal" title="Place Mission Landing Target">
+              <span class="terrain-swatch goal"></span>
               <div class="terrain-meta">
-                <span class="name">Set Goal</span>
-                <span class="cost">Target Site</span>
+                <span class="name">Set Landing</span>
+                <span class="cost">Mission Goal</span>
               </div>
             </button>
           </div>
         </section>
 
-        <!-- Algorithm Selection -->
+        <!-- Navigation Algorithms -->
         <section class="panel-section">
-          <h2 class="section-title">Pathfinding Algorithm</h2>
+          <h2 class="section-title">Navigation Algorithm</h2>
           <div class="algorithm-selector">
             <select id="algoSelect" class="styled-select">
               <option value="astar" selected>A* Search (Manhattan Heuristic)</option>
-              <option value="dijkstra">Dijkstra's Algorithm</option>
+              <option value="dijkstra">Dijkstra's Algorithm (Cost-Uniform)</option>
               <option value="bfs">Breadth-First Search (BFS)</option>
-              <option value="greedy">Greedy Best-First</option>
+              <option value="greedy">Greedy Best-First Search</option>
             </select>
           </div>
         </section>
 
-        <!-- Primary Actions -->
+        <!-- Primary Action Stack -->
         <section class="panel-section">
-          <h2 class="section-title">Navigation Controls</h2>
+          <h2 class="section-title">Mission Execution</h2>
           <div class="action-stack">
-            <button class="btn btn-primary" id="btnPlan">
+            <button class="btn btn-primary" id="btnPlan" title="Compute Path (Shortcut: P)">
               <span class="btn-icon">⚡</span>
-              <span>Compute Plan</span>
+              <span>Compute Optimal Plan</span>
             </button>
-            <button class="btn btn-secondary" id="btnCompare">
+            <button class="btn btn-secondary" id="btnCompare" title="Benchmark All Algorithms (Shortcut: C)">
               <span class="btn-icon">📊</span>
-              <span>Compare All (4 Algos)</span>
+              <span>Compare All 4 Algos</span>
             </button>
-            <button class="btn btn-accent" id="btnSimulate">
+            <button class="btn btn-accent" id="btnSimulate" title="Simulate Dynamic Obstacles & Online Replanning">
               <span class="btn-icon">🚀</span>
               <span>Simulate Dynamic Patrols</span>
             </button>
           </div>
         </section>
 
-        <!-- Map Presets & Generation -->
+        <!-- Procedural Map Generator -->
         <section class="panel-section">
-          <h2 class="section-title">Terrain Generator</h2>
+          <h2 class="section-title">Martian Terrain Generator</h2>
           <div class="generator-controls">
+            <div class="input-row mb-2">
+              <label for="gridSizeSelect">Grid Size:</label>
+              <select id="gridSizeSelect" class="styled-select select-compact">
+                <option value="24x16" selected>24 × 16 (Standard)</option>
+                <option value="40x25">40 × 25 (Wide Patrol)</option>
+                <option value="100x100">100 × 100 (Deep Crater)</option>
+              </select>
+            </div>
             <div class="input-row">
               <label for="mapSeedInput">Seed:</label>
               <input type="number" id="mapSeedInput" value="42" class="styled-input">
               <button class="btn btn-sm btn-icon-only" id="btnRndSeed" title="Randomize Seed">🎲</button>
             </div>
             <div class="preset-pills">
-              <button class="pill-btn" data-preset="maze">Maze</button>
-              <button class="pill-btn" data-preset="swamp">Swamp</button>
-              <button class="pill-btn" data-preset="pass">Pass</button>
+              <button class="pill-btn" data-preset="maze">Canyon Maze</button>
+              <button class="pill-btn" data-preset="swamp">Dune Basin</button>
+              <button class="pill-btn" data-preset="pass">Crater Pass</button>
               <button class="pill-btn" id="btnResetClear">Clear</button>
             </div>
             <button class="btn btn-sm btn-outline w-100 mt-2" id="btnGenerateMap">Generate Procedural Map</button>
           </div>
         </section>
 
-        <!-- Simulation Parameters -->
+        <!-- Dynamic Patrol Simulation Parameters -->
         <section class="panel-section">
-          <h2 class="section-title">Dynamic Obstacles</h2>
+          <h2 class="section-title">Patrol Hazard Parameters</h2>
           <div class="slider-group">
             <div class="slider-header">
-              <span>Obstacle Count</span>
+              <span>Dynamic Hazards</span>
               <span class="slider-val" id="valObstacles">8</span>
             </div>
             <input type="range" id="sliderObstacles" min="0" max="40" value="8" class="styled-slider">
           </div>
           <div class="slider-group mt-2">
             <div class="slider-header">
-              <span>Playback Speed</span>
+              <span>Playback Rate</span>
               <span class="slider-val" id="valSpeed">5x</span>
             </div>
             <input type="range" id="sliderSpeed" min="1" max="10" value="5" class="styled-slider">
           </div>
           <div class="sim-playback-bar mt-2">
-            <button class="btn btn-sm btn-icon-only" id="btnPlayPause" title="Play/Pause">▶️</button>
-            <button class="btn btn-sm btn-icon-only" id="btnStepForward" title="Step Tick">⏭️</button>
-            <button class="btn btn-sm btn-icon-only" id="btnStopSim" title="Reset">⏹️</button>
+            <button class="btn btn-sm btn-icon-only" id="btnPlayPause" title="Play/Pause Simulation (Shortcut: Space)">▶️</button>
+            <button class="btn btn-sm btn-icon-only" id="btnStepForward" title="Step Single Tick (Shortcut: S)">⏭️</button>
+            <button class="btn btn-sm btn-icon-only" id="btnStopSim" title="Stop & Reset (Shortcut: R)">⏹️</button>
+          </div>
+        </section>
+
+        <!-- Keyboard Shortcuts Help -->
+        <section class="panel-section shortcuts-panel">
+          <div class="shortcuts-legend">
+            <span><kbd>Space</kbd> Play/Pause</span>
+            <span><kbd>S</kbd> Step</span>
+            <span><kbd>R</kbd> Reset</span>
+            <span><kbd>P</kbd> Plan</span>
+            <span><kbd>C</kbd> Compare</span>
+            <span><kbd>M</kbd> Mute</span>
           </div>
         </section>
       </aside>
 
-      <!-- Center Canvas Workspace -->
+      <!-- Center Viewport & Canvas Workspace -->
       <section class="viewport-area">
         <div class="canvas-card">
+          <!-- Canvas Toolbar -->
           <div class="canvas-toolbar">
             <div class="grid-info">
               <span class="info-pill" id="gridDimText">Grid: 24 × 16</span>
@@ -182,16 +211,19 @@
               <span class="info-pill status-ready" id="missionStatusText">STATUS: READY</span>
             </div>
             <div class="toolbar-actions">
-              <button class="tool-action-btn" id="btnZoomFit" title="Fit to Screen">🔍 Reset View</button>
+              <button class="tool-action-btn active" id="btnToggleGrid" title="Toggle Coordinate Grid Lines"># Grid</button>
+              <button class="tool-action-btn active" id="btnToggleHeatmap" title="Toggle Search Heatmap">⚡ Heatmap</button>
+              <button class="tool-action-btn" id="btnZoomFit" title="Fit & Reset Canvas Scaling">🔍 Reset View</button>
             </div>
           </div>
 
+          <!-- Canvas Interactive Viewport -->
           <div class="canvas-wrapper" id="canvasWrapper">
             <canvas id="navCanvas" width="960" height="640"></canvas>
           </div>
         </div>
 
-        <!-- Telemetry & Metrics Bar -->
+        <!-- Telemetry & Metrics Deck -->
         <div class="telemetry-deck">
           <div class="metric-card">
             <div class="metric-icon">📏</div>
@@ -203,7 +235,7 @@
           <div class="metric-card">
             <div class="metric-icon">⚡</div>
             <div class="metric-data">
-              <span class="metric-label">Accumulated Cost</span>
+              <span class="metric-label">Energy Cost</span>
               <span class="metric-value highlight" id="valCost">--</span>
             </div>
           </div>
@@ -217,14 +249,14 @@
           <div class="metric-card">
             <div class="metric-icon">🔄</div>
             <div class="metric-data">
-              <span class="metric-label">Replans</span>
+              <span class="metric-label">Online Replans</span>
               <span class="metric-value" id="valReplans">--</span>
             </div>
           </div>
           <div class="metric-card">
             <div class="metric-icon">⏱️</div>
             <div class="metric-data">
-              <span class="metric-label">Compute Time</span>
+              <span class="metric-label">Execution Time</span>
               <span class="metric-value" id="valRuntime">-- µs</span>
             </div>
           </div>
@@ -232,12 +264,15 @@
       </section>
     </main>
 
-    <!-- Comparison Modal -->
+    <!-- Algorithm Benchmark Comparison Modal -->
     <div class="modal-overlay hidden" id="compareModal">
       <div class="modal-card">
         <div class="modal-header">
-          <h3>Algorithm Benchmark Matrix</h3>
-          <button class="modal-close" id="btnCloseModal">✕</button>
+          <div class="modal-title-group">
+            <h3>Algorithm Benchmark Matrix</h3>
+            <span class="modal-subtitle">Comparative performance across all 4 search strategies on current terrain</span>
+          </div>
+          <button class="modal-close" id="btnCloseModal" title="Close Modal">✕</button>
         </div>
         <div class="modal-body">
           <table class="benchmark-table">
@@ -245,7 +280,7 @@
               <tr>
                 <th>Algorithm</th>
                 <th>Steps</th>
-                <th>Terrain Cost</th>
+                <th>Accumulated Cost</th>
                 <th>Nodes Explored</th>
                 <th>Max Frontier</th>
                 <th>Execution Time</th>
@@ -262,6 +297,7 @@
     </div>
   </div>
 
-  <script src="app.js"></script>
+  <!-- Main ES Module Bootstrap -->
+  <script type="module" src="app.js"></script>
 </body>
 </html>
